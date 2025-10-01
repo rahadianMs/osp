@@ -1,14 +1,249 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoHotel Calculator - Hitung Jejak Karbon Hotel Anda</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Link ke file CSS -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+
+    <header class="navbar">
+        <div class="container">
+            <a href="#" class="nav-brand">EcoHotel Calculator</a>
+            <nav class="nav-links">
+                <a href="#features">Fitur</a>
+                <a href="#calculator-section">Kalkulator</a>
+                <a href="#">Kontak</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container hero-content">
+                <h1>Lacak dan Kurangi Jejak Karbon Hotel Anda</h1>
+                <p>Gunakan alat hitung berbasis Protokol GHG untuk mengukur emisi dari operasional hotel Anda dan ambil langkah menuju pariwisata berkelanjutan.</p>
+                <button id="start-calculation-btn" class="btn btn-primary">Mulai Hitung Sekarang</button>
+            </div>
+        </section>
+
+        <!-- Calculator Section (Initially Hidden) -->
+        <section id="calculator-section" class="calculator-container hidden">
+            <div class="container">
+                <!-- Step Indicator -->
+                <div class="step-indicator-wrapper">
+                    <div id="step-indicator-1" class="step-indicator active">1</div>
+                    <div class="step-connector"></div>
+                    <div id="step-indicator-2" class="step-indicator">2</div>
+                    <div class="step-connector"></div>
+                    <div id="step-indicator-3" class="step-indicator">3</div>
+                    <div class="step-connector"></div>
+                    <div id="step-indicator-4" class="step-indicator">4</div>
+                </div>
+
+                <form id="calculator-form" onsubmit="return false;">
+                    <!-- Step 1: Data Hotel -->
+                    <div id="step-1" class="step-card">
+                        <h2 class="step-title">Langkah 1: Informasi Dasar Hotel</h2>
+                        <p class="step-description">Masukkan data umum properti Anda untuk periode pelaporan selama 12 bulan terakhir.</p>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="hotelName">Nama Hotel</label>
+                                <input type="text" id="hotelName" placeholder="Contoh: Hotel Bintang Lima">
+                            </div>
+                            <div class="form-group">
+                                <label for="occupiedRooms">Total Kamar Terisi (setahun)</label>
+                                <input type="number" id="occupiedRooms" placeholder="Contoh: 25000">
+                            </div>
+                            <div class="form-group">
+                                <label for="guestRoomArea">Total Luas Area Kamar & Koridor (m²)</label>
+                                <input type="number" id="guestRoomArea" placeholder="Contoh: 8000">
+                            </div>
+                            <div class="form-group">
+                                <label for="meetingRoomArea">Total Luas Ruang Pertemuan (m²)</label>
+                                <input type="number" id="meetingRoomArea" placeholder="Contoh: 1500">
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                             <button type="button" onclick="nextStep(2)" class="btn btn-primary">Lanjut</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Konsumsi Energi -->
+                    <div id="step-2" class="step-card hidden">
+                         <h2 class="step-title">Langkah 2: Konsumsi Energi</h2>
+                         <p class="step-description">Masukkan total konsumsi semua sumber energi hotel Anda selama 12 bulan. Kosongkan jika tidak digunakan.</p>
+                         <div class="form-grid-narrow">
+                            <div class="form-group-row">
+                                <label>Listrik (PLN)</label>
+                                <div class="input-with-unit">
+                                    <input type="number" data-energy-type="listrik" class="energy-value" placeholder="0">
+                                    <span>kWh</span>
+                                </div>
+                            </div>
+                             <div class="form-group-row">
+                                <label>Gas Alam (PGN)</label>
+                                <div class="input-with-unit">
+                                    <input type="number" data-energy-type="gas_alam" class="energy-value" placeholder="0">
+                                    <span>m³</span>
+                                </div>
+                            </div>
+                            <div class="form-group-row">
+                                <label>LPG</label>
+                                <div class="input-with-unit">
+                                    <input type="number" data-energy-type="lpg" class="energy-value" placeholder="0">
+                                    <span>kg</span>
+                                </div>
+                            </div>
+                            <div class="form-group-row">
+                                <label>Solar / Diesel</label>
+                                <div class="input-with-unit">
+                                    <input type="number" data-energy-type="solar" class="energy-value" placeholder="0">
+                                    <span>Liter</span>
+                                </div>
+                            </div>
+                             <div class="form-group-row">
+                                <label>Bensin / Petrol</label>
+                                <div class="input-with-unit">
+                                    <input type="number" data-energy-type="bensin" class="energy-value" placeholder="0">
+                                    <span>Liter</span>
+                                </div>
+                            </div>
+                         </div>
+                         <div class="form-actions space-between">
+                            <button type="button" onclick="prevStep(1)" class="btn btn-secondary">Kembali</button>
+                            <button type="button" onclick="nextStep(3)" class="btn btn-primary">Lanjut</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3: Perhitungan Limbah -->
+                    <div id="step-3" class="step-card hidden">
+                        <h2 class="step-title">Langkah 3: Perhitungan Limbah (Waste)</h2>
+                        <p class="step-description">Masukkan total berat limbah (dalam kg) selama setahun berdasarkan metode pengolahannya.</p>
+                         <div class="form-grid-narrow">
+                             <div class="form-group-row">
+                                <label>Limbah Dibuang ke TPA (Landfill)</label>
+                                <div class="input-with-unit">
+                                    <input type="number" id="wasteTPA" placeholder="0">
+                                    <span>kg</span>
+                                </div>
+                            </div>
+                            <div class="form-group-row">
+                                <label>Limbah Dibakar (Incineration)</label>
+                                <div class="input-with-unit">
+                                    <input type="number" id="wasteIncineration" placeholder="0">
+                                    <span>kg</span>
+                                </div>
+                            </div>
+                            <div class="form-group-row">
+                                <label>Limbah Dibuat Kompos</label>
+                                <div class="input-with-unit">
+                                    <input type="number" id="wasteComposting" placeholder="0">
+                                    <span>kg</span>
+                                </div>
+                            </div>
+                             <div class="form-group-row">
+                                <label>Limbah Didaur Ulang</label>
+                                <div class="input-with-unit">
+                                    <input type="number" id="wasteRecycling" placeholder="0">
+                                    <span>kg</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions space-between">
+                            <button type="button" onclick="prevStep(2)" class="btn btn-secondary">Kembali</button>
+                            <button type="button" onclick="calculateResults()" class="btn btn-primary">Lihat Dasbor</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Hasil / Dashboard -->
+                    <div id="step-4" class="hidden">
+                        <div class="dashboard">
+                            <div class="dashboard-header">
+                               <div>
+                                   <h2 class="dashboard-title">Dasbor Emisi Hotel</h2>
+                                   <p class="dashboard-subtitle" id="resultHotelName">Ringkasan untuk Hotel Anda</p>
+                               </div>
+                               <button type="button" onclick="resetCalculator()" class="btn btn-secondary">Hitung Ulang</button>
+                            </div>
+                            <div class="dashboard-grid">
+                                <div class="dashboard-main">
+                                    <div class="kpi-card-large">
+                                        <h3>Total Emisi Tahunan</h3>
+                                        <p><span id="totalEmissions">0.00</span> tCO₂e</p>
+                                    </div>
+                                    <div class="chart-card">
+                                        <h3>Komposisi Sumber Emisi</h3>
+                                        <div class="chart-container">
+                                            <canvas id="emissionsPieChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="dashboard-sidebar">
+                                    <div class="kpi-card">
+                                        <h4>Emisi per Kamar</h4>
+                                        <p><span id="emissionsPerRoom">0.00</span></p>
+                                        <span>kgCO₂e / kamar terisi</span>
+                                    </div>
+                                    <div class="kpi-card">
+                                        <h4>Emisi Ruang Pertemuan</h4>
+                                        <p><span id="emissionsPerMeeting">0.00</span></p>
+                                        <span>kgCO₂e / m² / jam</span>
+                                    </div>
+                                    <div class="recommendation-card">
+                                        <h4>Rekomendasi Aksi</h4>
+                                        <p id="recommendationText">Isi data untuk melihat rekomendasi.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="features-section">
+            <div class="container">
+                <h2 class="section-title">Mengapa Menggunakan Kalkulator Kami?</h2>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <h3>Akurat & Sesuai Standar</h3>
+                        <p>Perhitungan didasarkan pada GHG Protocol, standar internasional untuk inventarisasi emisi.</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>Dasbor Interaktif</h3>
+                        <p>Visualisasikan data emisi Anda dengan grafik yang mudah dipahami untuk pengambilan keputusan yang lebih baik.</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>Rekomendasi Cerdas</h3>
+                        <p>Dapatkan saran praktis untuk mengurangi jejak karbon berdasarkan sumber emisi terbesar hotel Anda.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 EcoHotel Calculator. Dibuat untuk pariwisata Indonesia yang berkelanjutan.</p>
+        </div>
+    </footer>
+
+    <!-- Link ke file JavaScript -->
+    <script src="main.js" defer></script>
 </body>
 </html>
