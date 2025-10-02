@@ -63,6 +63,49 @@ body {
 .landing-nav nav { display: flex; align-items: center; gap: 1.5rem; }
 .landing-nav nav a { text-decoration: none; color: var(--text-light); font-weight: 500; transition: opacity 0.2s ease; opacity: 0.8; }
 .landing-nav nav a:hover { opacity: 1; }
+
+/* Dropdown Menu Styles */
+.nav-item.dropdown { 
+    position: relative;
+    padding-bottom: 1rem; /* Creates an invisible hover area to bridge the gap */
+    margin-bottom: -1rem; /* Prevents the padding from affecting layout */
+}
+.dropdown-menu {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: rgba(60, 60, 60, 0.8); /* Semi-transparent grey */
+    backdrop-filter: blur(5px); /* Blur effect for readability */
+    min-width: 250px;
+    box-shadow: var(--shadow-lg);
+    border-radius: 8px;
+    z-index: 1001;
+    padding: 0.5rem 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.nav-item.dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.dropdown-item {
+    display: block;
+    padding: 0.75rem 1.25rem;
+    color: var(--text-light); /* Light text for contrast */
+    text-decoration: none;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+}
+.dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.15); /* Subtle hover effect */
+}
+
+
 .lang-switcher { display: flex; gap: 0.5rem; align-items: center; cursor: pointer; }
 
 .hero { 
