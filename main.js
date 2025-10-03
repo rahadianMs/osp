@@ -1,113 +1,100 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Elemen Halaman Utama ---
+
+    // --- Page Flow Management ---
     const pages = {
         landing: document.getElementById('landing-page'),
         auth: document.getElementById('auth-page'),
         app: document.getElementById('app-wrapper')
     };
 
-    // --- Tombol Navigasi Antar Halaman ---
-    const goToLoginBtn = document.getElementById('go-to-auth-btn');
-    const goToRegisterBtn = document.getElementById('go-to-auth-btn-hero');
-    const loginBtn = document.getElementById('login-btn');
-    const registerBtn = document.getElementById('register-btn');
-    const backToLandingButton = document.querySelector('.back-to-landing-btn');
-    const backToLoginButton = document.querySelector('.back-to-login-btn');
-
-    // --- Elemen Form ---
-    const loginEmailInput = document.getElementById('login-email');
-    const loginPasswordInput = document.getElementById('login-password');
-    const loginError = document.getElementById('login-error');
-    const loginForm = document.getElementById('login-form-container');
-    const registerForm = document.getElementById('register-form-container');
-    const showRegisterLink = document.getElementById('show-register-link');
-    const showLoginLink = document.getElementById('show-login-link');
-
-    // --- Fungsi untuk Menampilkan Halaman (Landing, Auth, App) ---
     const showPage = (pageToShow) => {
-        // Sembunyikan semua container halaman utama
-        for (const pageName in pages) {
-            if (pages[pageName]) {
-                pages[pageName].classList.add('hidden');
-            }
-        }
-        // Tampilkan hanya halaman yang diinginkan
+        Object.values(pages).forEach(page => page.classList.add('hidden'));
         if (pageToShow) {
             pageToShow.classList.remove('hidden');
-            window.scrollTo(0, 0);
+            window.scrollTo(0, 0); // Scroll to top on page change
         }
     };
-    
-    // --- Event Listener untuk Alur Aplikasi ---
 
-    // Dari Landing (Header Login) -> Auth (Login Form)
-    goToLoginBtn.addEventListener('click', (e) => {
-        e.preventDefault();
+    // --- Navigation from Landing to Auth ---
+    const goToAuthBtn = document.getElementById('go-to-auth-btn');
+    const goToAuthBtnHero = document.getElementById('go-to-auth-btn-hero');
+    const loginFormContainer = document.getElementById('login-form-container');
+    const registerFormContainer = document.getElementById('register-form-container');
+
+    const showAuthPage = (showLogin = true) => {
         showPage(pages.auth);
-        registerForm.classList.add('hidden');
-        loginForm.classList.remove('hidden');
-    });
-
-    // Dari Landing (Hero Register) -> Auth (Register Form)
-    goToRegisterBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        showPage(pages.auth);
-        loginForm.classList.add('hidden');
-        registerForm.classList.remove('hidden');
-    });
-
-    // Dari Auth (Login Form) -> Landing (Tombol Kembali)
-    if (backToLandingButton) {
-        backToLandingButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            showPage(pages.landing);
-        });
-    }
-    
-    // Dari Auth (Register Form) -> Halaman Utama (Tombol Kembali)
-    if (backToLoginButton) {
-        backToLoginButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            showPage(pages.landing);
-        });
-    }
-    
-    // Dari Auth (Login) -> App
-    loginBtn.addEventListener('click', () => {
-        const email = loginEmailInput.value;
-        const password = loginPasswordInput.value;
-        loginError.classList.add('hidden');
-
-        if (email.trim() !== '' && password.trim() !== '') {
-            showPage(pages.app);
-            showPageInDashboard('beranda');
+        if (showLogin) {
+            loginFormContainer.classList.remove('hidden');
+            registerFormContainer.classList.add('hidden');
         } else {
-            loginError.classList.remove('hidden');
+            loginFormContainer.classList.add('hidden');
+            registerFormContainer.classList.remove('hidden');
         }
+    };
+
+    if(goToAuthBtn) goToAuthBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        showAuthPage(true); // Show login form by default
     });
 
-    // Dari Auth (Register) -> App
-    registerBtn.addEventListener('click', () => {
+    if(goToAuthBtnHero) goToAuthBtnHero.addEventListener('click', (e) => {
+        e.preventDefault();
+        showAuthPage(false); // Show register form from hero button
+    });
+
+
+    // --- Auth Page Internal Logic ---
+    const showRegisterLink = document.getElementById('show-register-link');
+    const showLoginLink = document.getElementById('show-login-link');
+    const backToLandingBtns = document.querySelectorAll('.back-to-landing-btn');
+
+    if(showRegisterLink) showRegisterLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginFormContainer.classList.add('hidden');
+        registerFormContainer.classList.remove('hidden');
+    });
+
+    if(showLoginLink) showLoginLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        registerFormContainer.classList.add('hidden');
+        loginFormContainer.classList.remove('hidden');
+    });
+
+    backToLandingBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage(pages.landing);
+        });
+    });
+
+    // --- Login/Register to App ---
+    const loginBtn = document.getElementById('login-btn');
+    const registerBtn = document.getElementById('register-btn');
+    const loginError = document.getElementById('login-error');
+
+    const showApp = () => {
         showPage(pages.app);
         showPageInDashboard('beranda');
-    });
+    };
+    
+    if (loginBtn) {
+        loginBtn.addEventListener('click', () => {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            if (loginError) loginError.classList.add('hidden');
 
-    // Beralih antara form Login dan Register
-    showRegisterLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        loginForm.classList.add('hidden');
-        registerForm.classList.remove('hidden');
-    });
+            if (email.trim() !== '' && password.trim() !== '') {
+                showApp();
+            } else {
+                if (loginError) loginError.classList.remove('hidden');
+            }
+        });
+    }
 
-    showLoginLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        registerForm.classList.add('hidden');
-        loginForm.classList.remove('hidden');
-    });
+    if (registerBtn) registerBtn.addEventListener('click', showApp);
 
 
-    // --- Logika Internal Dasbor Aplikasi ---
-
+    // --- Dashboard Internal Logic ---
     const sidebarLinks = document.querySelectorAll('.sidebar-link');
     const pageContents = document.querySelectorAll('.page-content');
     const pageTitle = document.getElementById('page-title');
@@ -134,14 +121,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Logika untuk Menu Pengguna (User Menu) ---
+    // --- User Menu Logic ---
     const userMenuBtn = document.getElementById('user-menu-btn');
     const userMenuDropdown = document.getElementById('user-menu-dropdown');
 
     if (userMenuBtn) {
         userMenuBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            userMenuDropdown.classList.toggle('visible');
+            if (userMenuDropdown) userMenuDropdown.classList.toggle('visible');
         });
     }
 
@@ -150,6 +137,42 @@ document.addEventListener('DOMContentLoaded', () => {
             userMenuDropdown.classList.remove('visible');
         }
     });
+    
+    // --- Smooth Scrolling for Anchor Links ---
+    document.querySelectorAll('a.scroll-link').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            if(targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
 
+    // --- Participant List Tab Logic ---
+    const tabContainer = document.querySelector('.participant-tabs');
+    const logoGrids = document.querySelectorAll('.participant-logos-grid');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+
+    if (tabContainer) {
+        tabContainer.addEventListener('click', (e) => {
+            if (e.target.matches('.tab-btn')) {
+                const category = e.target.dataset.category;
+
+                tabBtns.forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+
+                logoGrids.forEach(grid => {
+                    grid.classList.remove('active');
+                    if (grid.id === `logos-${category}`) {
+                        grid.classList.add('active');
+                    }
+                });
+            }
+        });
+    }
 });
 
